@@ -1,2 +1,2 @@
-# fullstackopen_mooc
-Fullstack Open Mooc submission repo
+# Submision repo for the fullstackopen_mooc course provided by Helsinki University
+That's it folks
