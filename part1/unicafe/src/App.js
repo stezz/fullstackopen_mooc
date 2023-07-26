@@ -20,6 +20,9 @@ const DisplayStats = (props) => {
         <p>good: {props.good}</p>
         <p>bad: {props.bad}</p>
         <p>neutral: {props.neutral}</p>
+        <p>total: {props.total}</p>
+        <p>average: {props.average}</p>
+        <p>positive: {props.positive}%</p>
       </div>
     )
   }
@@ -30,12 +33,23 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
+  const [total, setTotal] = useState(0)
+  const [points, setPoints] = useState(0)
 
   const updateGood = () => {
     console.log("good var is", good)
     const newGood = good + 1
     setGood(newGood)
     console.log("good var after is", newGood)
+    console.log("points var is", points)
+    console.log("total var is", total)
+    const newPoints = points + 1
+    const newTotal = total + 1
+    setTotal(newTotal)
+    setPoints(newPoints)
+    console.log("points var after is", newPoints)
+    console.log("total var after is", newTotal)
+
   }
 
   const updateBad = () => {
@@ -43,6 +57,14 @@ const App = () => {
     const newBad = bad + 1    
     setBad(newBad)
     console.log("bad var after is", newBad)
+    console.log("points var is", points)
+    console.log("total var is", total)
+    const newPoints = points - 1
+    const newTotal = total + 1
+    setTotal(newTotal)
+    setPoints(newPoints)
+    console.log("points var after is", newPoints)
+    console.log("total var after is", newTotal)
   }
 
   const updateNeutral = () => {
@@ -50,6 +72,10 @@ const App = () => {
     const newNeutral = neutral + 1 
     setNeutral(newNeutral)
     console.log("neutral var after is", newNeutral)
+    console.log("total var is", total)
+    const newTotal = total + 1
+    setTotal(newTotal)
+    // No need to update points here
   }
 
   return (
@@ -58,8 +84,12 @@ const App = () => {
       <Button handleClick={updateGood} text='good' />
       <Button handleClick={updateBad} text='bad' />
       <Button handleClick={updateNeutral} text='neutral' />
-      <DisplayStats good={good} bad={bad} neutral={neutral} />
-
+      <DisplayStats good={good} 
+                    bad={bad}
+                    neutral={neutral}
+                    total={total}
+                    average={points / total}
+                    positive={good / total * 100} />
     </div>
   )
 }
