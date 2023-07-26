@@ -11,7 +11,7 @@ const Button = (props) => {
   }
 
 
-const DisplayStats = (props) => {
+const Statistics = (props) => {
     //console.log('Rendering Button with text', props.text)
     
     return (
@@ -84,7 +84,7 @@ const App = () => {
       <Button handleClick={updateGood} text='good' />
       <Button handleClick={updateBad} text='bad' />
       <Button handleClick={updateNeutral} text='neutral' />
-      <DisplayStats good={good} 
+      <Statistics good={good} 
                     bad={bad}
                     neutral={neutral}
                     total={total}
