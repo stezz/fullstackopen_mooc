@@ -1,29 +1,37 @@
 const Header = (props) => {
-  console.log("Arguments passed", props)
+  console.log("Calling Header component - Arguments passed", props)
   return(
     <h1>{props.course}</h1>
   )
 }
 
-const Content = (props) => {
-  console.log("Arguments passed", props)
+const Part = (props) => {
+  console.log("Calling Part component - Arguments passed", props)
   return(
-    <>
     <p>
-      {props.part1} {props.exercises1}
+      {props.part} {props.exercises}
     </p>
-    <p>
-      {props.part2} {props.exercises2}
-    </p>
-    <p>
-      {props.part3} {props.exercises3}
-    </p>
-    </>  
+  )
+
+  
+}
+
+const Content = (props) => {
+  console.log("Calling Content component - Arguments passed", props)
+  return(
+    <div>
+      <Part part = {props.part1} 
+            exercises = {props.exercises1}/>
+      <Part part = {props.part2} 
+            exercises = {props.exercises2}/>
+      <Part part = {props.part3} 
+            exercises = {props.exercises3}/>
+    </div>  
   )
 }
 
 const Total = (props) => {
-  console.log("Arguments passed", props)
+  console.log("Calling Total component - Arguments passed", props)
   return(
     <p> Number of exercises {props.exercises1 + props.exercises2 + props.exercises3}</p>
   )
