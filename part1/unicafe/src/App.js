@@ -14,17 +14,28 @@ const Button = (props) => {
 const Statistics = (props) => {
     //console.log('Rendering Button with text', props.text)
     
-    return (
-      <div>
-        <h1>Statistics</h1>
-        <p>good: {props.good}</p>
-        <p>bad: {props.bad}</p>
-        <p>neutral: {props.neutral}</p>
-        <p>total: {props.total}</p>
-        <p>average: {props.average}</p>
-        <p>positive: {props.positive}%</p>
-      </div>
-    )
+    if (props.total > 0) {
+      return (
+        <div>
+          <h1>Statistics</h1>
+          <p>good: {props.good} </p>
+          <p>bad: {props.bad}</p>
+          <p>neutral: {props.neutral}</p>
+          <p>total: {props.total}</p>
+          <p>average: {props.average}</p>
+          <p>positive: {props.positive}%</p>
+        
+     </div> 
+      )
+    }
+    else {
+      return (
+        <div>
+          <h1>Statistics</h1>
+            <p>No feedback given yet :(</p>
+        </div> 
+      )
+    }
   }
 
 
