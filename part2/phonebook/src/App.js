@@ -38,7 +38,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      .<ul>
+      <ul>
           {persons.map(person =>
           <Person key={person.name} person={person} />
         )}
