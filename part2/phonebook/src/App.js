@@ -2,16 +2,18 @@ import { useState } from 'react'
 
 const Person = ({ person }) => {
   return (
-    <li>{person.name}</li>
+    <li>Name: {person.name} - Number: {person.number}</li>
   )
 }
 
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    { name: 'Arto Hellas', number: "050405060" }
   ]) 
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+
 
   const addPerson = (event) => {
     // handles the addition of a new person
@@ -22,10 +24,19 @@ const App = () => {
       // existing already
       alert(`${newName} is already in the phonebook`)
     } else {
+      if (newNumber === "") {
+        // checking if there is a number for this new contact
+        alert(`please add a number for ${newName}`)
+      } else {
       console.log("we think that", newName, "is not here")
-      setPersons(persons.concat({name: newName}))
+      setPersons(persons.concat({name: newName, number: newNumber}))
+      // we intentionally clean both name and number only upon 
+      // succesfull new entry
+      setNewName("")
+      setNewNumber("")
+      }
     }
-    setNewName("")
+
   }
 
   const handleNameChange = (event) => {
@@ -33,13 +44,27 @@ const App = () => {
     setNewName(event.target.value)
   }
 
+  const handleNumberChange = (event) => {
+    console.log(event.target.value)
+    setNewNumber(event.target.value)
+  }
+  
+
   return (
     <div>
       <h2>Phonebook</h2>
       <form onSubmit={addPerson}>
         <div>        
-          name: <input value={newName}
-          onChange={handleNameChange}/>
+          <div>
+            name: <input value={newName}
+            onChange={handleNameChange}/>
+          </div>
+          <div>
+            number: <input value={newNumber}
+            onChange={handleNumberChange}/>
+          </div>
+          
+
         </div>
         <div>
           <button type="submit">add</button>
