@@ -6,6 +6,60 @@ const Person = ({ person }) => {
   )
 }
 
+const PersonForm = (props) => {
+  console.log("Form props:", props)
+  const handleNameChange = (event) => {
+    console.log(event.target.value)
+    props.setNewName(event.target.value)
+  }
+
+  const handleNumberChange = (event) => {
+    console.log(event.target.value)
+    props.setNewNumber(event.target.value)
+  }
+
+  return (
+    <form onSubmit={props.addPerson}>
+    <div>   
+      <h2>Add a new number</h2>     
+      <div>
+        name: <input value={props.newName}
+        onChange={handleNameChange}/>
+      </div>
+      <div>
+        number: <input value={props.newNumber}
+        onChange={handleNumberChange}/>
+      </div>
+    </div>
+    <div>
+      <button type="submit">add</button>
+    </div>
+    </form>
+  )
+}
+
+const Filter = (props) => {
+  console.log("Filter props:", props);
+  const handleFilterChange = (event) => {
+    console.log("filter for", event.target.value)
+    props.setFilterTerm(event.target.value)
+  }
+  return (
+  <div>filter names <input onChange={handleFilterChange}/></div>
+  )
+}
+
+const Persons = (props) => {
+  // just a quick function to simplify the code below
+  const lowerCaseFilter = (p) => p.name.toLowerCase().includes(props.filterTerm.toLowerCase())
+  return (
+      <ul>
+      {props.persons.filter(lowerCaseFilter).map(person =>
+      <Person key={person.id} person={person} />
+    )}
+    </ul>
+  )
+}
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -19,8 +73,6 @@ const App = () => {
   // declaring a stateful filterTerm to be able to pass it around
   // there may be a better way but I don't know what
   const [filterTerm, setFilterTerm] = useState('')
-
-
 
   const addPerson = (event) => {
     // handles the addition of a new person
@@ -47,54 +99,14 @@ const App = () => {
 
   }
 
-  const handleNameChange = (event) => {
-    console.log(event.target.value)
-    setNewName(event.target.value)
-  }
-
-  const handleNumberChange = (event) => {
-    console.log(event.target.value)
-    setNewNumber(event.target.value)
-  }
-
-  const handleFilterChange = (event) => {
-    console.log("filter for", event.target.value)
-    setFilterTerm(event.target.value)
-  }
-
-  // just a quick function to simplify the code below
-  const lowerCaseFilter = (p) => p.name.toLowerCase().includes(filterTerm.toLowerCase())
-
   return (
     <div>
       <h2>Phonebook</h2>
-      filter names <input onChange={handleFilterChange}/>
-
-
-      <form onSubmit={addPerson}>
-        <div>   
-          <h2>Add a new number</h2>     
-          <div>
-            name: <input value={newName}
-            onChange={handleNameChange}/>
-          </div>
-          <div>
-            number: <input value={newNumber}
-            onChange={handleNumberChange}/>
-          </div>
-          
-
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter filterTerm={filterTerm} setFilterTerm={setFilterTerm} />
+      <PersonForm setNewName={setNewName} newName={newName} setNewNumber={setNewNumber} newNumber={newNumber} addPerson={addPerson}/> 
       <h2>Numbers</h2>
-      <ul>
-          {persons.filter(lowerCaseFilter).map(person =>
-          <Person key={person.id} person={person} />
-        )}
-      </ul>
+      <Persons persons={persons} filterTerm={filterTerm}/>
+
     </div>
   )
 }
