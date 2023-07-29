@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import phonebookService from './services/phonebook'
 
 
 const Person = ({ person }) => {
@@ -70,17 +70,16 @@ const App = () => {
   // declaring a stateful filterTerm to be able to pass it around
   // there may be a better way but I don't know what
   const [filterTerm, setFilterTerm] = useState('')
-
+  
   const hook = () => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
+    phonebookService.getPersons()
+      .then(initialPersons => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        setPersons(initialPersons)
       })
   }
-  
+
   useEffect(hook, [])
   const addPerson = (event) => {
     // handles the addition of a new person
@@ -96,8 +95,12 @@ const App = () => {
         alert(`please add a number for ${newName}`)
       } else {
       console.log("we think that", newName, "is not here")
-      const maxId = Math.max(...persons.map(p => p.id))
-      setPersons(persons.concat({name: newName, number: newNumber, id: maxId + 1}))
+      // const maxId = Math.max(...persons.map(p => p.id))
+      // const newPerson = {name: newName, number: newNumber, id: maxId + 1}
+      const newPerson = {name: newName, number: newNumber}
+      phonebookService.createPerson(newPerson)
+        .then(returnedPerson => 
+        setPersons(persons.concat(returnedPerson)))
       // we intentionally clean both name and number only upon 
       // succesfull new entry
       setNewName("")
