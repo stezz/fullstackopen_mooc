@@ -67,7 +67,8 @@ const Persons = (props) => {
   const handleDelete = (person) => {
     if (window.confirm(`You sure you want to delete ${person.name} ?`)) {
       console.log("[handle delete] - deleting person with id", person.id);
-      phonebookService.deletePerson(person.id).then((data) => {
+      console.log("this is setNotification before we call deletePerson", props.setNotification);
+      phonebookService.deletePerson(person.id, props.setNotification()).then((data) => {
         console.log("logging response data after delete:", data.status);
         if (data.status === 200) {
           console.log("deleted");
@@ -144,7 +145,7 @@ const App = () => {
         ) {
           const newPerson = { ...modPerson, number: newNumber };
 
-          phonebookService.updatePerson(newPerson).then((returnedPerson) => {
+          phonebookService.updatePerson(newPerson, setNotification()).then((returnedPerson) => {
             console.log("We got this person back", returnedPerson);
             const newData = persons.filter((p) => p.id !== modPerson.id);
             newData.push(newPerson);

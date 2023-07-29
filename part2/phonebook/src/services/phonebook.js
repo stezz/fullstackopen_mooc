@@ -10,26 +10,48 @@ const getPersons = () => {
   });
 };
 
-const createPerson = (newObject) => {
+const createPerson = (props) => {
+  const {newObject,setNotification} = props
   console.log("Creating a new person in the phonebook: ", newObject);
-  const request = axios.post(baseUrl, newObject);
+  const request = axios.post(baseUrl, newObject)
+
   console.log("This just happened:", request);
-  return request.then((response) => response.data);
+  return request.then((response) => response.data)
+  .catch(error => {
+    setNotification(`${error} while updating ${newObject.name}`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  });
+  
 };
 
-const deletePerson = (id) => {
+const deletePerson = (props) => {
+  const {id, setNotification} = props
+  console.log("this is setNotification", setNotification);
   console.log("Deleting person with id", id);
-  const request = axios.delete(`${baseUrl}/${id}`);
+  const request = axios.delete(`${baseUrl}/${id}`)
   console.log("This just happened:", request);
-  return request.then((response) => response);
-};
+  return request.then((response) => response)
+  .catch(error => {setNotification(`${error} while deleting person with id ${id}`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+})}
 
-const updatePerson = (newPerson) => {
+const updatePerson = (props) => {
+  const {newPerson, setNotification} = props
   console.log("Updating person with id", newPerson.id);
   console.log("we received this data", newPerson);
-  const request = axios.put(`${baseUrl}/${newPerson.id}`, newPerson);
+  const request = axios.put(`${baseUrl}/${newPerson.id}`, newPerson)
   console.log("This just happened:", request);
-  return request.then((response) => response);
+  return request.then((response) => response)
+  .catch(error => {
+    setNotification(`${error} while updating ${newPerson.name}`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  })
 };
 
 export default { getPersons, createPerson, deletePerson, updatePerson };
