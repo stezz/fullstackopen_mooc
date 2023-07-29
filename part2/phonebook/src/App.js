@@ -68,8 +68,8 @@ const Persons = (props) => {
     if (window.confirm(`You sure you want to delete ${person.name} ?`)) {
       console.log("[handle delete] - deleting person with id", person.id);
       console.log("this is setNotification before we call deletePerson", props.setNotification);
-      phonebookService.deletePerson(person.id, props.setNotification()).then((data) => {
-        console.log("logging response data after delete:", data.status);
+      phonebookService.deletePerson(person.id).then((data) => {
+        console.log("logging response data after delete:", data);
         if (data.status === 200) {
           console.log("deleted");
           const newSetPersons = props.persons.filter((p) => p.id !== person.id);
@@ -79,7 +79,14 @@ const Persons = (props) => {
             props.setNotification(null)
           }, 5000)
         }
-      });
+      })
+      .catch(error => {
+        props.setError(`${error} while updating ${person.name}`)
+        setTimeout(() => {
+          props.setError(null)
+        }, 5000)
+      })
+      ;
     }
   };
 
@@ -103,10 +110,24 @@ const App = () => {
   // declaring a stateful filterTerm to be able to pass it around
   // there may be a better way but I don't know what
   const [filterTerm, setFilterTerm] = useState("");
-  const [notification, setNotification] = useState(null)
+  const [notification, setNotification] = useState(null)  
+  const [error, setError] = useState(null)
+
 
 
   const Notification = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+  
+    return (
+      <div className='notification'>
+        {message}
+      </div>
+    )
+  }
+
+  const ErrorNotification = ({ message }) => {
     if (message === null) {
       return null
     }
@@ -157,7 +178,15 @@ const App = () => {
             setTimeout(() => {
               setNotification(null)
             }, 5000)
-          });
+          })
+          .catch(error => {
+            setError(`${error} while updating ${newName}`
+            )
+            setTimeout(() => {
+              setError(null)
+            }, 5000)
+          })
+          ;
         }
       } else {
         if (newName === "") {
@@ -169,18 +198,28 @@ const App = () => {
           const newPerson = { name: newName, number: newNumber };
           phonebookService
             .createPerson(newPerson)
-            .then((returnedPerson) =>
+            .then((returnedPerson) => {
               setPersons(persons.concat(returnedPerson))
-            );
+              setNotification(`${newName} was added to the phonebook `)
+              setNewName("");
+              setNewNumber("");
+              setTimeout(() => {
+                setNotification(null)
+              }, 5000)
+            }
+            )
+            .catch(error => {
+              setError(`${error} while creating ${newName}`
+              )
+              setTimeout(() => {
+                setError(null)
+              }, 5000)
+            })
+
           // we intentionally clean both name and number only upon
           // succesfull new entry
           
-          setNotification(`${newName} was added to the phonebook `)
-          setNewName("");
-          setNewNumber("");
-          setTimeout(() => {
-            setNotification(null)
-          }, 5000)
+
 
         }
       }
@@ -191,6 +230,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification message={notification} />
+      <ErrorNotification message={error} />
       <Filter filterTerm={filterTerm} setFilterTerm={setFilterTerm} />
       <PersonForm
         setNewName={setNewName}
@@ -206,6 +246,7 @@ const App = () => {
         filterTerm={filterTerm}
         setPersons={setPersons}
         setNotification={setNotification}
+        setError={setError}
       />
     </div>
   );

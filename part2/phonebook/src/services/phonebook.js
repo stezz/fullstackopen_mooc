@@ -10,48 +10,28 @@ const getPersons = () => {
   });
 };
 
-const createPerson = (props) => {
-  const {newObject,setNotification} = props
+const createPerson = (newObject) => {
   console.log("Creating a new person in the phonebook: ", newObject);
   const request = axios.post(baseUrl, newObject)
 
   console.log("This just happened:", request);
-  return request.then((response) => response.data)
-  .catch(error => {
-    setNotification(`${error} while updating ${newObject.name}`)
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
-  });
-  
+  return request.then((response) => response.data)  
 };
 
-const deletePerson = (props) => {
-  const {id, setNotification} = props
-  console.log("this is setNotification", setNotification);
+const deletePerson = (id) => {
   console.log("Deleting person with id", id);
   const request = axios.delete(`${baseUrl}/${id}`)
   console.log("This just happened:", request);
   return request.then((response) => response)
-  .catch(error => {setNotification(`${error} while deleting person with id ${id}`)
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
-})}
+}
 
-const updatePerson = (props) => {
-  const {newPerson, setNotification} = props
+const updatePerson = (newPerson) => {
   console.log("Updating person with id", newPerson.id);
   console.log("we received this data", newPerson);
   const request = axios.put(`${baseUrl}/${newPerson.id}`, newPerson)
   console.log("This just happened:", request);
   return request.then((response) => response)
-  .catch(error => {
-    setNotification(`${error} while updating ${newPerson.name}`)
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
-  })
+
 };
 
 export default { getPersons, createPerson, deletePerson, updatePerson };
