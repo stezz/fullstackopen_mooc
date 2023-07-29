@@ -2,9 +2,14 @@ import { useState, useEffect } from 'react'
 import phonebookService from './services/phonebook'
 
 
-const Person = ({ person }) => {
+const Person = ({person, handleDelete}) => {
+
+  console.log('Person component got this person', person);
+
   return (
-    <li>Name: {person.name} - Number: {person.number}</li>
+    <li>Name: {person.name} - Number: {person.number} 
+    <button type='button' onClick={handleDelete}>delete</button>
+    </li>
   )
 }
 
@@ -54,10 +59,27 @@ const Filter = (props) => {
 const Persons = (props) => {
   // just a quick function to simplify the code below
   const lowerCaseFilter = (p) => p.name.toLowerCase().includes(props.filterTerm.toLowerCase())
+
+  const handleDelete = (person) => {
+    if ( window.confirm(`You sure you want to delete ${person.name} ?`)) {
+      console.log('[handle delete] - deleting person with id', person.id)
+      phonebookService.deletePerson(person.id).then(data => {
+        console.log('logging response data after delete:', data.status)
+        if ( data.status === 200 ) { 
+          console.log('deleted')
+          const newSetPersons = props.persons.filter(p => p.id !== person.id)
+          props.setPersons(newSetPersons)
+        }
+    }
+      )
+
+    }
+  }
+
   return (
       <ul>
       {props.persons.filter(lowerCaseFilter).map(person =>
-      <Person key={person.id} person={person} />
+      <Person key={person.id} person={person} handleDelete={() => handleDelete(person)}/>
     )}
     </ul>
   )
@@ -117,9 +139,12 @@ const App = () => {
       <PersonForm setNewName={setNewName} 
                   newName={newName} setNewNumber={setNewNumber} 
                   newNumber={newNumber} addPerson={addPerson}
+                  setPersons={setPersons}
       /> 
       <h2>Numbers</h2>
-      <Persons persons={persons} filterTerm={filterTerm}/>
+      <Persons persons={persons} 
+                filterTerm={filterTerm} 
+                setPersons={setPersons}/>
     </div>
   )
 }
