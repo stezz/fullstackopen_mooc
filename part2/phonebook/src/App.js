@@ -14,6 +14,7 @@ const Person = ({ person, handleDelete }) => {
   );
 };
 
+
 const PersonForm = (props) => {
   console.log("Form props:", props);
   const handleNameChange = (event) => {
@@ -72,6 +73,10 @@ const Persons = (props) => {
           console.log("deleted");
           const newSetPersons = props.persons.filter((p) => p.id !== person.id);
           props.setPersons(newSetPersons);
+          props.setNotification(`${person.name} was deleted from the phonebook`)
+          setTimeout(() => {
+            props.setNotification(null)
+          }, 5000)
         }
       });
     }
@@ -97,6 +102,20 @@ const App = () => {
   // declaring a stateful filterTerm to be able to pass it around
   // there may be a better way but I don't know what
   const [filterTerm, setFilterTerm] = useState("");
+  const [notification, setNotification] = useState(null)
+
+
+  const Notification = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+  
+    return (
+      <div className='error'>
+        {message}
+      </div>
+    )
+  }
 
   const hook = () => {
     console.log("effect");
@@ -131,8 +150,12 @@ const App = () => {
             newData.push(newPerson);
             console.log(newData);
             setPersons(newData);
+            setNotification(`${newName} was updated in the phonebook `)
             setNewName("");
             setNewNumber("");
+            setTimeout(() => {
+              setNotification(null)
+            }, 5000)
           });
         }
       } else {
@@ -150,8 +173,14 @@ const App = () => {
             );
           // we intentionally clean both name and number only upon
           // succesfull new entry
+          
+          setNotification(`${newName} was added to the phonebook `)
           setNewName("");
           setNewNumber("");
+          setTimeout(() => {
+            setNotification(null)
+          }, 5000)
+
         }
       }
     }
@@ -160,6 +189,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter filterTerm={filterTerm} setFilterTerm={setFilterTerm} />
       <PersonForm
         setNewName={setNewName}
@@ -174,6 +204,7 @@ const App = () => {
         persons={persons}
         filterTerm={filterTerm}
         setPersons={setPersons}
+        setNotification={setNotification}
       />
     </div>
   );
