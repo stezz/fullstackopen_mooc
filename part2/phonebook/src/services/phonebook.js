@@ -24,4 +24,12 @@ const getPersons = () => {
     return request.then(response => response)
   }
 
-export default { getPersons, createPerson, deletePerson }
+  const updatePerson = (newPerson) => {
+    console.log('Updating person with id', newPerson.id);
+    console.log("we received this data", newPerson);
+    const request = axios.put(`${baseUrl}/${newPerson.id}`, newPerson)
+    console.log('This just happened:', request);
+    return request.then(response => response)
+  }
+
+export default { getPersons, createPerson, deletePerson, updatePerson }

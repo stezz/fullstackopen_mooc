@@ -107,15 +107,35 @@ const App = () => {
     // handles the addition of a new person
     event.preventDefault()
     console.log("this is a new Person:", newName)
-    if (persons.some((p) => p.name === newName)) {
-      // checking if there is at least one instance of the newName 
-      // existing already
-      alert(`${newName} is already in the phonebook`)
+    if (newNumber === "") {
+      // checking if there is a number for this new contact
+      alert(`please add a number for ${newName}`)
     } else {
-      if (newNumber === "") {
-        // checking if there is a number for this new contact
-        alert(`please add a number for ${newName}`)
+
+    
+    if (persons.some((p) => p.name === newName)) {
+      const modPerson = persons.find(p => p.name === newName)
+      console.log('This person already exist but there is a new number');
+      if ( window.confirm(`A record for ${newName} already exist. You sure you want to change the number for ${newName} ?`)) {
+          const newPerson = {...modPerson, number: newNumber}
+
+          phonebookService.updatePerson(newPerson)
+          .then(returnedPerson => {
+            console.log('We got this person back', returnedPerson);
+            const newData = persons.filter(p => p.id !== modPerson.id)
+            newData.push(newPerson)
+            console.log(newData)
+            setPersons(newData)
+            setNewName("")
+            setNewNumber("")
+          }
+          )
+      }
       } else {
+        if ( newName === "") {
+          alert(`please add a name for this number`)
+
+        } else {
       console.log("we think that", newName, "is not here")
       // const maxId = Math.max(...persons.map(p => p.id))
       // const newPerson = {name: newName, number: newNumber, id: maxId + 1}
@@ -127,9 +147,9 @@ const App = () => {
       // succesfull new entry
       setNewName("")
       setNewNumber("")
+        }
       }
     }
-
   }
 
   return (
