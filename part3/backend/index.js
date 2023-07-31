@@ -27,6 +27,15 @@ transforms it into a JavaScript object and then attaches it to the body
 property of the request object before the route handler is called.
 */
 
+const requestLogger = (request, response, next) => {
+  console.log('Method:', request.method)
+  console.log('Path:  ', request.path)
+  console.log('Body:  ', request.body)
+  console.log('---')
+  next()
+}
+
+app.use(requestLogger)
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
@@ -96,3 +105,9 @@ app.delete('/api/notes/:id', (request, response) => {
   
     response.json(note)
   })
+
+  const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+  }
+  
+  app.use(unknownEndpoint)
