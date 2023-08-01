@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const password = process.argv[2]
 const encPass = encodeURIComponent(password)
 const url =
-  `mongodb+srv://instezz:${password}@cluster0.zggnasp.mongodb.net/phonebookApp?retryWrites=true&w=majority`
+  `mongodb+srv://instezz:${password}@cluster0.zggnasp.mongodb.net/phApp?retryWrites=true&w=majority`
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
 
