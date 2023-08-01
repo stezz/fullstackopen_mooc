@@ -1,6 +1,10 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
+
 app.use(express.json())
+app.use(cors())
+app.use(express.static('build'))
 
 
 let notes = [
@@ -35,7 +39,14 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
+
+
 app.use(requestLogger)
+
+const PORT = process.env.PORT || 3001
+
+console.log("i got this port from process", process.env.PORT);
+console.log("and I am using this port:", PORT);
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
@@ -44,11 +55,7 @@ app.get('/', (request, response) => {
 app.get('/api/notes', (request, response) => {
     response.json(notes)
   })
-  
-const PORT = 3001
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-  })
+
 
 app.get('/api/notes/:id', (request, response) => {
     const id = Number(request.params.id)
@@ -111,3 +118,10 @@ app.delete('/api/notes/:id', (request, response) => {
   }
   
   app.use(unknownEndpoint)
+
+
+
+
+app.listen(PORT, () => {
+  console.log(`Official Server running on port ${PORT}`)
+})
