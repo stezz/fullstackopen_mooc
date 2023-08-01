@@ -5,6 +5,8 @@ const cors = require("cors")
 const app = express();
 app.use(express.json());
 app.use(cors())
+// serving the static build with this
+app.use(express.static('build'))
 morgan.token("responseBody", function (res) {
   return JSON.stringify(res.body);
 });
