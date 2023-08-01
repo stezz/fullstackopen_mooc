@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "name": "Run phonebook_backend",
+            "request": "launch",
+            "command": "npm start",
+            "cwd": "${workspaceFolder}/part3/phonebook_backend"
+        }
+    ]
+}
