@@ -1,7 +1,10 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors")
+
 const app = express();
 app.use(express.json());
+app.use(cors())
 morgan.token("responseBody", function (res) {
   return JSON.stringify(res.body);
 });
@@ -83,6 +86,7 @@ app.get("/api/persons/:id", (request, response) => {
 app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
   persons = persons.filter((person) => person.id !== id);
+  console.log("current status of persons is now", persons);
   response.status(204).end();
 });
 
