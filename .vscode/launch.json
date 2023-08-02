@@ -6,6 +6,13 @@
             "request": "launch",
             "command": "npm start",
             "cwd": "${workspaceFolder}/part3/phonebook_backend"
+        },
+        {
+            "type": "node-terminal",
+            "name": "Run mongoose",
+            "request": "launch",
+            "command": "node mongo.js SPVtMnjwQC7JgjAi test 123515",
+            "cwd": "${workspaceFolder}/part3/phonebook_backend"
         }
     ]
 }
