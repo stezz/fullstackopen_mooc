@@ -70,7 +70,7 @@ const Persons = (props) => {
       console.log("this is setNotification before we call deletePerson", props.setNotification);
       phonebookService.deletePerson(person.id).then((data) => {
         console.log("logging response data after delete:", data);
-        if (data.status === 204) {
+        if (data.status === 204 || data.status === 200) {
           console.log(`${person.name} deleted`);
           const newSetPersons = props.persons.filter((p) => p.id !== person.id);
           props.setPersons(newSetPersons);

@@ -51,6 +51,26 @@ app.get("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error))
 })
 
+app.put("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndUpdate(
+    request.params.id,
+    { number: request.body.number },
+    // the option below returns the document _after_ it was update
+    // otherwise it would return the doc _before_
+    { new: true }
+  )
+    .then((person) => {
+      if (person) {
+        console.log("person updated!")
+        response.json(person)
+      } else {
+        console.log(person)
+        response.status(404).end()
+      }
+    })
+    .catch((error) => next(error))
+})
+
 app.post("/api/persons", (request, response) => {
   const body = request.body
   if (body.name && body.number) {
@@ -65,7 +85,7 @@ app.post("/api/persons", (request, response) => {
         })
       } else {
         console.log("Person already existing in the DB")
-        console.log("Found:", existingPerson);
+        console.log("Found:", existingPerson)
         response.statusMessage = "Person already exists"
         response.status(400).end()
       }
