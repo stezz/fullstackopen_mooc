@@ -4,6 +4,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 const { resourceUsage } = require('process')
 const blogsRouter = require('./controllers/blogs')
+const logger = require('./utils/logger')
 require('dotenv').config()
 const mongoUrl = process.env.MONGODB_URI
 
@@ -18,5 +19,5 @@ app.use('/api/blogs', blogsRouter)
 
 const PORT = 3003
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  logger.info(`Server running on port ${PORT}`)
 })
