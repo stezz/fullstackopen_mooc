@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import phonebookService from "./services/phonebook";
 
+
+
 const Person = ({ person, handleDelete }) => {
   console.log("Person component got this person", person);
 
@@ -211,7 +213,7 @@ const App = () => {
             }
             )
             .catch(error => {
-              setError(`${error} while creating ${newName}`
+              setError(`${error.response.data.error.message} while creating ${newName}`
               )
               setTimeout(() => {
                 setError(null)

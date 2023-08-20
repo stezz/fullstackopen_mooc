@@ -71,7 +71,7 @@ app.put("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error))
 })
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body
   if (body.name && body.number) {
     const person = new Person({
@@ -83,13 +83,16 @@ app.post("/api/persons", (request, response) => {
         person.save().then((savedPerson) => {
           response.json(savedPerson)
         })
+        .catch((error) => {
+          console.log("this is the error", error);
+          next(error)})
       } else {
         console.log("Person already existing in the DB")
         console.log("Found:", existingPerson)
         response.statusMessage = "Person already exists"
         response.status(400).end()
       }
-    })
+    })    
   } else {
     console.log("missing either name or number")
     response.statusMessage = "Provide both name and number"
@@ -121,10 +124,11 @@ app.delete("/api/persons/:id", (request, response, next) => {
 })
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
-
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" })
+  } else if (error.name == "ValidationError") {
+    return response.status(400).json({error: error})
+    
   }
 
   next(error)
