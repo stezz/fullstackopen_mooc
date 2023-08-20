@@ -57,7 +57,7 @@ app.put("/api/persons/:id", (request, response, next) => {
     { number: request.body.number },
     // the option below returns the document _after_ it was update
     // otherwise it would return the doc _before_
-    { new: true }
+    { new: true, runValidators: true, context: "query" }
   )
     .then((person) => {
       if (person) {
@@ -80,19 +80,22 @@ app.post("/api/persons", (request, response, next) => {
     })
     Person.findOne({ name: body.name }).then((existingPerson) => {
       if (!existingPerson) {
-        person.save().then((savedPerson) => {
-          response.json(savedPerson)
-        })
-        .catch((error) => {
-          console.log("this is the error", error);
-          next(error)})
+        person
+          .save()
+          .then((savedPerson) => {
+            response.json(savedPerson)
+          })
+          .catch((error) => {
+            console.log("this is the error", error)
+            next(error)
+          })
       } else {
         console.log("Person already existing in the DB")
         console.log("Found:", existingPerson)
         response.statusMessage = "Person already exists"
         response.status(400).end()
       }
-    })    
+    })
   } else {
     console.log("missing either name or number")
     response.statusMessage = "Provide both name and number"
@@ -127,8 +130,7 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" })
   } else if (error.name == "ValidationError") {
-    return response.status(400).json({error: error})
-    
+    return response.status(400).json({ error: error })
   }
 
   next(error)

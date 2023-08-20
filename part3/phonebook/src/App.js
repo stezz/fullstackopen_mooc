@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import phonebookService from "./services/phonebook";
-
-
+import { useState, useEffect } from "react"
+import phonebookService from "./services/phonebook"
 
 const Person = ({ person, handleDelete }) => {
-  console.log("Person component got this person", person);
+  console.log("Person component got this person", person)
 
   return (
     <li>
@@ -13,21 +11,20 @@ const Person = ({ person, handleDelete }) => {
         delete
       </button>
     </li>
-  );
-};
-
+  )
+}
 
 const PersonForm = (props) => {
-  console.log("Form props:", props);
+  console.log("Form props:", props)
   const handleNameChange = (event) => {
-    console.log(event.target.value);
-    props.setNewName(event.target.value);
-  };
+    console.log(event.target.value)
+    props.setNewName(event.target.value)
+  }
 
   const handleNumberChange = (event) => {
-    console.log(event.target.value);
-    props.setNewNumber(event.target.value);
-  };
+    console.log(event.target.value)
+    props.setNewNumber(event.target.value)
+  }
 
   return (
     <form onSubmit={props.addPerson}>
@@ -45,54 +42,65 @@ const PersonForm = (props) => {
         <button type="submit">add</button>
       </div>
     </form>
-  );
-};
+  )
+}
 
 const Filter = (props) => {
-  console.log("Filter props:", props);
+  console.log("Filter props:", props)
   const handleFilterChange = (event) => {
-    console.log("filter for", event.target.value);
-    props.setFilterTerm(event.target.value);
-  };
+    console.log("filter for", event.target.value)
+    props.setFilterTerm(event.target.value)
+  }
   return (
     <div>
       filter names <input onChange={handleFilterChange} />
     </div>
-  );
-};
+  )
+}
 
 const Persons = (props) => {
   // just a quick function to simplify the code below
   const lowerCaseFilter = (p) =>
-    p.name.toLowerCase().includes(props.filterTerm.toLowerCase());
+    p.name.toLowerCase().includes(props.filterTerm.toLowerCase())
 
   const handleDelete = (person) => {
     if (window.confirm(`You sure you want to delete ${person.name} ?`)) {
-      console.log("[handle delete] - deleting person with id", person.id);
-      console.log("this is setNotification before we call deletePerson", props.setNotification);
-      phonebookService.deletePerson(person.id).then((data) => {
-        console.log("logging response data after delete:", data);
-        if (data.status === 204 || data.status === 200) {
-          console.log(`${person.name} deleted`);
-          const newSetPersons = props.persons.filter((p) => p.id !== person.id);
-          props.setPersons(newSetPersons);
-          props.setNotification(`${person.name} was deleted from the phonebook`)
+      console.log("[handle delete] - deleting person with id", person.id)
+      console.log(
+        "this is setNotification before we call deletePerson",
+        props.setNotification
+      )
+      phonebookService
+        .deletePerson(person.id)
+        .then((data) => {
+          console.log("logging response data after delete:", data)
+          if (data.status === 204 || data.status === 200) {
+            console.log(`${person.name} deleted`)
+            const newSetPersons = props.persons.filter(
+              (p) => p.id !== person.id
+            )
+            props.setPersons(newSetPersons)
+            props.setNotification(
+              `${person.name} was deleted from the phonebook`
+            )
+            setTimeout(() => {
+              props.setNotification(null)
+            }, 5000)
+          } else {
+            console.log(
+              "we got a different status that we expected. Status:",
+              data.status
+            )
+          }
+        })
+        .catch((error) => {
+          props.setError(`${error} while updating ${person.name}`)
           setTimeout(() => {
-            props.setNotification(null)
+            props.setError(null)
           }, 5000)
-        } else {  
-          console.log("we got a different status that we expected. Status:", data.status);
-        }
-      })
-      .catch(error => {
-        props.setError(`${error} while updating ${person.name}`)
-        setTimeout(() => {
-          props.setError(null)
-        }, 5000)
-      })
-      ;
+        })
     }
-  };
+  }
 
   return (
     <ul>
@@ -104,116 +112,113 @@ const Persons = (props) => {
         />
       ))}
     </ul>
-  );
-};
+  )
+}
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
+  const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState("")
+  const [newNumber, setNewNumber] = useState("")
   // declaring a stateful filterTerm to be able to pass it around
   // there may be a better way but I don't know what
-  const [filterTerm, setFilterTerm] = useState("");
-  const [notification, setNotification] = useState(null)  
+  const [filterTerm, setFilterTerm] = useState("")
+  const [notification, setNotification] = useState(null)
   const [error, setError] = useState(null)
-
-
 
   const Notification = ({ message }) => {
     if (message === null) {
       return null
     }
-  
-    return (
-      <div className='notification'>
-        {message}
-      </div>
-    )
+
+    return <div className="notification">{message}</div>
   }
 
   const ErrorNotification = ({ message }) => {
     if (message === null) {
       return null
     }
-  
-    return (
-      <div className='error'>
-        {message}
-      </div>
-    )
+
+    return <div className="error">{message}</div>
   }
 
   const hook = () => {
-    console.log("effect");
+    console.log("effect")
     phonebookService.getPersons().then((initialPersons) => {
-      console.log("promise fulfilled");
-      setPersons(initialPersons);
-    });
-  };
+      console.log("promise fulfilled")
+      setPersons(initialPersons)
+    })
+  }
 
-  useEffect(hook, []);
+  useEffect(hook, [])
   const addPerson = (event) => {
     // handles the addition of a new person
-    event.preventDefault();
-    console.log("this is a new Person:", newName);
+    event.preventDefault()
+    console.log("this is a new Person:", newName)
     if (newNumber === "") {
       // checking if there is a number for this new contact
-      alert(`please add a number for ${newName}`);
+      alert(`please add a number for ${newName}`)
     } else {
       if (persons.some((p) => p.name === newName)) {
-        const modPerson = persons.find((p) => p.name === newName);
-        console.log("This person already exist but there is a new number");
+        const modPerson = persons.find((p) => p.name === newName)
+        console.log("This person already exist but there is a new number")
         if (
           window.confirm(
             `A record for ${newName} already exist. You sure you want to change the number for ${newName} ?`
           )
         ) {
-          const newPerson = { ...modPerson, number: newNumber };
+          const newPerson = { ...modPerson, number: newNumber }
 
-          phonebookService.updatePerson(newPerson, setNotification()).then((returnedPerson) => {
-            console.log("We got this person back", returnedPerson);
-            const newData = persons.filter((p) => p.id !== modPerson.id);
-            newData.push(newPerson);
-            console.log(newData);
-            setPersons(newData);
-            setNotification(`${newName} was updated in the phonebook `)
-            setNewName("");
-            setNewNumber("");
-            setTimeout(() => {
+          phonebookService
+            .updatePerson(newPerson, setNotification())
+            .then((returnedPerson) => {
+              console.log("We got this person back", returnedPerson)
+              const newData = persons.filter((p) => p.id !== modPerson.id)
+              newData.push(newPerson)
+              console.log(newData)
+              setPersons(newData)
+              setNotification(`${newName} was updated in the phonebook `)
+              setNewName("")
+              setNewNumber("")
+              setTimeout(() => {
+                setNotification(null)
+              }, 5000)
+            })
+            .catch((error) => {
+              console.log(
+                "We got this error",
+                error.response.data.error.message
+              )
               setNotification(null)
-            }, 5000)
-          })
-          .catch(error => {
-            setError(`${error} while updating ${newName}`
-            )
-            setTimeout(() => {
-              setError(null)
-            }, 5000)
-          })
-          ;
+              setError(
+                `${error.response.data.error.message} while updating ${newName}`
+              )
+              setTimeout(() => {
+                setError(null)
+              }, 5000)
+            })
         }
       } else {
         if (newName === "") {
-          alert(`please add a name for this number`);
+          alert(`please add a name for this number`)
         } else {
-          console.log("we think that", newName, "is not here");
+          console.log("we think that", newName, "is not here")
           // const maxId = Math.max(...persons.map(p => p.id))
           // const newPerson = {name: newName, number: newNumber, id: maxId + 1}
-          const newPerson = { name: newName, number: newNumber };
+          const newPerson = { name: newName, number: newNumber }
           phonebookService
             .createPerson(newPerson)
             .then((returnedPerson) => {
               setPersons(persons.concat(returnedPerson))
               setNotification(`${newName} was added to the phonebook `)
-              setNewName("");
-              setNewNumber("");
+              setNewName("")
+              setNewNumber("")
               setTimeout(() => {
                 setNotification(null)
               }, 5000)
-            }
-            )
-            .catch(error => {
-              setError(`${error.response.data.error.message} while creating ${newName}`
+            })
+            .catch((error) => {
+              setError(
+                `${error.response.data.error.message} while creating ${newName}`
               )
               setTimeout(() => {
                 setError(null)
@@ -222,13 +227,10 @@ const App = () => {
 
           // we intentionally clean both name and number only upon
           // succesfull new entry
-          
-
-
         }
       }
     }
-  };
+  }
 
   return (
     <div>
@@ -253,7 +255,7 @@ const App = () => {
         setError={setError}
       />
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
