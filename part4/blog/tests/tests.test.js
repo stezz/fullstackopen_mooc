@@ -72,19 +72,19 @@ const listWithOneBlog = [
 describe('favorite blog', () => {
   test('Find blog with most likes of many blogs', () => {
     const result = listHelper.favoriteBlog(manyBlogs)
-    expect(result).toEqual(    {
+    expect(result).toEqual({
       title: 'Canonical string reduction',
       author: 'Edsger W. Dijkstra',
       likes: 12,
-    },)
+    })
   })
   test('Find blog with most likes of one blog', () => {
     const result = listHelper.favoriteBlog(listWithOneBlog)
-    expect(result).toEqual(    {
+    expect(result).toEqual({
       title: 'Go To Statement Considered Harmful',
       author: 'Edsger W. Dijkstra',
       likes: 5,
-    },)
+    })
   })
 
   test('Find blog with most likes of empty list', () => {
@@ -94,8 +94,6 @@ describe('favorite blog', () => {
 })
 
 describe('total likes', () => {
-
-
   test('when list has only one blog, equals the likes of that', () => {
     const result = listHelper.totalLikes(listWithOneBlog)
     expect(result).toBe(5)
@@ -112,25 +110,43 @@ describe('total likes', () => {
   })
 })
 
-
 describe('author with most blogs', () => {
   test('Find author with most blogs of many blogs', () => {
     const result = listHelper.mostBlogs(manyBlogs)
-    expect(result).toEqual(    {
-      author: "Robert C. Martin",
-      blogs: 3
-    },)
+    expect(result).toEqual({
+      author: 'Robert C. Martin',
+      blogs: 3,
+    })
   })
   test('Find author with most blogs of one blog', () => {
     const result = listHelper.mostBlogs(listWithOneBlog)
-    expect(result).toEqual(    {
+    expect(result).toEqual({
       author: 'Edsger W. Dijkstra',
       blogs: 1,
-    },)
+    })
   })
 
   test('Find author with most blogs of empty list', () => {
     const result = listHelper.mostBlogs([])
+    expect(result).toEqual([])
+  })
+})
+
+describe('author with most likes', () => {
+  test('Find author with most likes of many blogs', () => {
+    const result = listHelper.mostLikes(manyBlogs)
+    expect(result).toEqual({ author: 'Edsger W. Dijkstra', likes: 19 })
+  })
+  test('Find author with most likes of one blog', () => {
+    const result = listHelper.mostLikes(listWithOneBlog)
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 5,
+    })
+  })
+
+  test('Find author with most likes of empty list', () => {
+    const result = listHelper.mostLikes([])
     expect(result).toEqual([])
   })
 })
