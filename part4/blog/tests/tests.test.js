@@ -21,7 +21,7 @@ const manyBlogs = [
     title: 'Go To Statement Considered Harmful',
     author: 'Edsger W. Dijkstra',
     url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5,
+    likes: 7,
     __v: 0,
   },
   {
@@ -108,6 +108,29 @@ describe('total likes', () => {
 
   test('of a bigger list is calculated right', () => {
     const result = listHelper.totalLikes(manyBlogs)
-    expect(result).toBe(36)
+    expect(result).toBe(38)
+  })
+})
+
+
+describe('author with most blogs', () => {
+  test('Find author with most blogs of many blogs', () => {
+    const result = listHelper.mostBlogs(manyBlogs)
+    expect(result).toEqual(    {
+      author: "Robert C. Martin",
+      blogs: 3
+    },)
+  })
+  test('Find author with most blogs of one blog', () => {
+    const result = listHelper.mostBlogs(listWithOneBlog)
+    expect(result).toEqual(    {
+      author: 'Edsger W. Dijkstra',
+      blogs: 1,
+    },)
+  })
+
+  test('Find author with most blogs of empty list', () => {
+    const result = listHelper.mostBlogs([])
+    expect(result).toEqual([])
   })
 })
