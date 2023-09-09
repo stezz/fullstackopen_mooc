@@ -28,12 +28,37 @@ describe('4.8', () => {
   })
 })
 
-describe('4.9', ()=> {
-    test('there is an id field', async () => {
-        const response = await api.get('/api/blogs')
-        console.log(response.body[0])
-        expect(response.body[0].id).toBeDefined();
-      });
+describe('4.9', () => {
+  test('there is an id field', async () => {
+    const response = await api.get('/api/blogs')
+    console.log(response.body[0])
+    expect(response.body[0].id).toBeDefined()
+  })
+})
 
+describe('4.10', () => {
+  test('a POST operation successfully creates a new blog', async () => {
+    const newBlog = helper.initialBlogs[0]
+    const beforePost = await api.get('/api/blogs')
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    const afterPost = await api.get('/api/blogs')
+    expect(afterPost.body.length).toEqual(beforePost.body.length + 1)
+  })
 
+  test('a POST operation creates exactly the blog we want', async () => {
+    const newBlog = helper.initialBlogs[0]
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    const createdBlog = await api.get(`/api/blogs/${response.body.id}`)
+    // gotta delete the .id otherwise it doesn't match
+    delete createdBlog.body.id
+    expect(createdBlog.body).toEqual(newBlog)
+  })
 })

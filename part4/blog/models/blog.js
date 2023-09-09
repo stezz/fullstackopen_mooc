@@ -16,7 +16,7 @@ blogSchema.set('toJSON', {
 })
 
 /*
-// Using Mongoose virtual fields to solve ex. 4.9
+// Another way is using Mongoose virtual fields to solve ex. 4.9
 blogSchema.virtual('id').get(function(){
   return this._id.toHexString();
 });
