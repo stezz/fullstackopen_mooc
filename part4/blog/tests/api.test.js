@@ -14,7 +14,7 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 })
 
-describe('basic tests', () => {
+describe('4.8', () => {
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -26,4 +26,14 @@ describe('basic tests', () => {
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.initialBlogs.length)
   })
+})
+
+describe('4.9', ()=> {
+    test('there is an id field', async () => {
+        const response = await api.get('/api/blogs')
+        console.log(response.body[0])
+        expect(response.body[0].id).toBeDefined();
+      });
+
+
 })
