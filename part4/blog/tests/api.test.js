@@ -5,6 +5,7 @@ const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
+const { after } = require('lodash')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -38,7 +39,7 @@ describe('4.9', () => {
 
 describe('4.10', () => {
   test('a POST operation successfully creates a new blog', async () => {
-    const newBlog = helper.initialBlogs[0]
+    const newBlog = { ...helper.initialBlogs[0] }
     const beforePost = await api.get('/api/blogs')
     const response = await api
       .post('/api/blogs')
@@ -50,7 +51,7 @@ describe('4.10', () => {
   })
 
   test('a POST operation creates exactly the blog we want', async () => {
-    const newBlog = helper.initialBlogs[0]
+    const newBlog = { ...helper.initialBlogs[0] }
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
@@ -65,7 +66,7 @@ describe('4.10', () => {
 
 describe('4.11', () => {
   test('if the like property is missing it defaults to 0', async () => {
-    const newBlog = helper.initialBlogs[0]
+    const newBlog = { ...helper.initialBlogs[0] }
     delete newBlog.likes
     const response = await api
       .post('/api/blogs')
@@ -81,25 +82,41 @@ describe('4.11', () => {
 
 describe('4.12', () => {
   test('if the url property is missing it throws a 400 error', async () => {
-    const newBlog = {
-      title: 'That is a blog post',
-      author: 'Pooh Pooh',
-      likes: 5,
-    }
-
+    const newBlog = { ...helper.initialBlogs[0] }
+    delete newBlog.url
     await api.post('/api/blogs').send(newBlog).expect(400)
   })
 
   test('if the title property is missing it throws a 400 error', async () => {
-    const newBlog = {
-      author: 'Winnie Pooh',
-      url: 'https://something.com/blog/article',
-      likes: 4,
-    }
+    const newBlog = { ...helper.initialBlogs[0] }
+    delete newBlog.title
 
     await api.post('/api/blogs').send(newBlog).expect(400)
   })
 })
+
+
+describe('4.13', () => {
+  test('a blog post is properly deleted', async () => {
+    const beforeDelete = await api.get('/api/blogs')
+    await api.delete(`/api/blogs/${beforeDelete.body[0].id}`)
+    const afterDelete = await api.get('/api/blogs')
+    expect(afterDelete.body.length).toEqual(beforeDelete.body.length - 1)
+  })
+
+  test('exactly the blog post we want is properly deleted', async () => {
+    const beforeDelete = await api.get('/api/blogs')
+    const idToDelete = beforeDelete.body[0].id
+    await api.delete(`/api/blogs/${idToDelete}`)
+    const afterDelete = await api.get('/api/blogs')
+    ids = afterDelete.body.map((x) => x.id)
+    expect(ids).not.toContain(idToDelete)
+  })
+
+
+})
+
+
 
 afterAll(async () => {
   await mongoose.connection.close()
