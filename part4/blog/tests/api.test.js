@@ -81,21 +81,23 @@ describe('4.11', () => {
 
 describe('4.12', () => {
   test('if the url property is missing it throws a 400 error', async () => {
-    const newBlog = helper.initialBlogs[0]
-    console.log(newBlog)
-    delete newBlog.url
-    console.log(newBlog)
-    const response = await api.post('/api/blogs').send(newBlog).expect(400)
-    console.log(response.error)
-    expect(response.error.status).toEqual(400)
+    const newBlog = {
+      title: 'That is a blog post',
+      author: 'Pooh Pooh',
+      likes: 5,
+    }
+
+    await api.post('/api/blogs').send(newBlog).expect(400)
   })
 
   test('if the title property is missing it throws a 400 error', async () => {
-    const newBlog = helper.initialBlogs[0]
-    delete newBlog.title
-    const response = await api.post('/api/blogs').send(newBlog).expect(400)
-    console.log(response.error.status)
-    expect(response.error.status).toEqual(400)
+    const newBlog = {
+      author: 'Winnie Pooh',
+      url: 'https://something.com/blog/article',
+      likes: 4,
+    }
+
+    await api.post('/api/blogs').send(newBlog).expect(400)
   })
 })
 
