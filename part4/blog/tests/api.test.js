@@ -62,3 +62,20 @@ describe('4.10', () => {
     expect(createdBlog.body).toEqual(newBlog)
   })
 })
+
+describe('4.11', () => {
+    test('if the like property is missing it defaults to 0', async () => {
+      const newBlog = helper.initialBlogs[0]
+      delete newBlog.likes
+      const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+      const createdBlog = await api.get(`/api/blogs/${response.body.id}`)
+      // gotta delete the .id otherwise it doesn't match
+      delete createdBlog.body.id
+      expect(createdBlog.body.likes).toEqual(0)
+    })
+  })
+
