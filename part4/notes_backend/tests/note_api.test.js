@@ -61,6 +61,17 @@ test('note without content is not added', async () => {
   expect(notesAtEnd).toHaveLength(helper.initialNotes.length)
 })
 
+
+test('another note without content is not added', async () => {
+  const newNote = {
+    important: true,
+  }
+
+  await api.post('/api/notes').send(newNote).expect(400)
+  const notesAtEnd = await helper.notesInDb()
+  expect(notesAtEnd).toHaveLength(helper.initialNotes.length)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

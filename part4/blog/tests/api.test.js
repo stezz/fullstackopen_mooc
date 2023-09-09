@@ -64,18 +64,41 @@ describe('4.10', () => {
 })
 
 describe('4.11', () => {
-    test('if the like property is missing it defaults to 0', async () => {
-      const newBlog = helper.initialBlogs[0]
-      delete newBlog.likes
-      const response = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
-      const createdBlog = await api.get(`/api/blogs/${response.body.id}`)
-      // gotta delete the .id otherwise it doesn't match
-      delete createdBlog.body.id
-      expect(createdBlog.body.likes).toEqual(0)
-    })
+  test('if the like property is missing it defaults to 0', async () => {
+    const newBlog = helper.initialBlogs[0]
+    delete newBlog.likes
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    const createdBlog = await api.get(`/api/blogs/${response.body.id}`)
+    // gotta delete the .id otherwise it doesn't match
+    delete createdBlog.body.id
+    expect(createdBlog.body.likes).toEqual(0)
+  })
+})
+
+describe('4.12', () => {
+  test('if the url property is missing it throws a 400 error', async () => {
+    const newBlog = helper.initialBlogs[0]
+    console.log(newBlog)
+    delete newBlog.url
+    console.log(newBlog)
+    const response = await api.post('/api/blogs').send(newBlog).expect(400)
+    console.log(response.error)
+    expect(response.error.status).toEqual(400)
   })
 
+  test('if the title property is missing it throws a 400 error', async () => {
+    const newBlog = helper.initialBlogs[0]
+    delete newBlog.title
+    const response = await api.post('/api/blogs').send(newBlog).expect(400)
+    console.log(response.error.status)
+    expect(response.error.status).toEqual(400)
+  })
+})
+
+afterAll(async () => {
+  await mongoose.connection.close()
+})
