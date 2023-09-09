@@ -95,7 +95,6 @@ describe('4.12', () => {
   })
 })
 
-
 describe('4.13', () => {
   test('a blog post is properly deleted', async () => {
     const beforeDelete = await api.get('/api/blogs')
@@ -112,9 +111,49 @@ describe('4.13', () => {
     ids = afterDelete.body.map((x) => x.id)
     expect(ids).not.toContain(idToDelete)
   })
+})
 
+
+describe('4.14', () => {
+  test('We can update the blog title', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const toUpdate = initialBlogs.body[0]
+    toUpdate.title = 'A new title'
+    await api.put(`/api/blogs/${toUpdate.id}`).send(toUpdate)
+    const afterUpdate = await api.get(`/api/blogs/${toUpdate.id}`)
+    expect(afterUpdate.body.title).toEqual('A new title')
+  })
+
+  test('We can update the blog url', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const toUpdate = initialBlogs.body[0]
+    toUpdate.url = 'https://anewurl.com'
+    await api.put(`/api/blogs/${toUpdate.id}`).send(toUpdate)
+    const afterUpdate = await api.get(`/api/blogs/${toUpdate.id}`)
+    expect(afterUpdate.body.url).toEqual('https://anewurl.com')
+  })
+
+  test('We can update the blog author', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const toUpdate = initialBlogs.body[0]
+    toUpdate.author = 'A new author'
+    await api.put(`/api/blogs/${toUpdate.id}`).send(toUpdate)
+    const afterUpdate = await api.get(`/api/blogs/${toUpdate.id}`)
+    expect(afterUpdate.body.author).toEqual('A new author')
+  })
+
+  test('We can update the blog likes', async () => {
+    const initialBlogs = await api.get('/api/blogs')
+    const toUpdate = initialBlogs.body[0]
+    toUpdate.likes = 1234
+    await api.put(`/api/blogs/${toUpdate.id}`).send(toUpdate)
+    const afterUpdate = await api.get(`/api/blogs/${toUpdate.id}`)
+    expect(afterUpdate.body.likes).toEqual(1234)
+  })
 
 })
+
+
 
 
 
