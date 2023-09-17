@@ -1,4 +1,7 @@
+const { forEach } = require('lodash')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
 const initialBlogs = [
   {
@@ -21,6 +24,17 @@ const initialBlogs = [
   },
 ]
 
+const initialUsers = [
+  {
+    username: 'winnie',
+    name: 'Winnie Pooh',
+  },
+  {
+    username: 'pooh',
+    name: 'Pooh Pooh',
+  },
+]
+
 const nonExistingId = async () => {
   const blog = new blog({
     title: 'willremovethissoon',
@@ -39,8 +53,15 @@ const blogsInDb = async () => {
   return blogs.map((blog) => blog.toJSON())
 }
 
+const usersInDb = async () => {
+  const users = await User.find({})
+  return users.map((u) => u.toJSON())
+}
+
 module.exports = {
   initialBlogs,
+  initialUsers,
   nonExistingId,
   blogsInDb,
+  usersInDb,
 }

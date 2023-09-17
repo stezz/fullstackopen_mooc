@@ -3,8 +3,10 @@ const supertest = require('supertest')
 const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
+const bcrypt = require('bcrypt')
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const { after } = require('lodash')
 
 beforeEach(async () => {
@@ -113,7 +115,6 @@ describe('4.13', () => {
   })
 })
 
-
 describe('4.14', () => {
   test('We can update the blog title', async () => {
     const initialBlogs = await api.get('/api/blogs')
@@ -150,12 +151,149 @@ describe('4.14', () => {
     const afterUpdate = await api.get(`/api/blogs/${toUpdate.id}`)
     expect(afterUpdate.body.likes).toEqual(1234)
   })
-
 })
 
+describe('4.15 and 4.16', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
 
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
 
+    await user.save()
+  })
 
+  test('creation fails with proper statuscode and message if username already taken', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'root',
+      name: 'Superuser',
+      password: 'salainen',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('expected `username` to be unique')
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toEqual(usersAtStart)
+  })
+
+  test('creation succeeds with a fresh username and a password longer than 3 chars', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'mluukkai',
+      name: 'Matti Luukkainen',
+      password: 'salainen',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map((u) => u.username)
+    expect(usernames).toContain(newUser.username)
+  })
+
+  test('creation fails if password is missing', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'winnie',
+      name: 'Winnie Pooh',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('password must be set')
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toEqual(usersAtStart)
+  })
+
+  test('creation fails if password is shorter than 3 chars', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'winnie',
+      name: 'Winnie Pooh',
+      password: 'ba',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain(
+      'password must be at least 3 chars long'
+    )
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toEqual(usersAtStart)
+  })
+})
+
+describe('4.17', () => {
+  let createdUser
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    const nonAdmin = new User({ username: 'guy', passwordHash })
+
+    await user.save()
+    createdUser = await nonAdmin.save()
+  })
+
+  test('new blog creation succeeds with user with proper ID', async () => {
+    console.log(createdUser._id.toString())
+    const newBlog = {
+      ...helper.initialBlogs[0],
+      userId: createdUser._id.toString(),
+    }
+    const beforePost = await api.get('/api/blogs')
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    const afterPost = await api.get('/api/blogs')
+    expect(afterPost.body.length).toEqual(beforePost.body.length + 1)
+  })
+
+  test('new blog creation fails with wrong user ID', async () => {
+    const newBlog = {
+      ...helper.initialBlogs[0],
+      userId: '4506e30cdb6db28cac2bdc11',
+    }
+
+    const result = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('User provided does not exist')
+  })
+})
 
 afterAll(async () => {
   await mongoose.connection.close()
