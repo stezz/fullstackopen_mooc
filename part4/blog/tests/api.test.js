@@ -295,7 +295,6 @@ describe('4.17', () => {
   })
 })
 
-
 describe('4.18', () => {
   let createdUser
   beforeEach(async () => {
@@ -312,19 +311,72 @@ describe('4.18', () => {
   test('login for a user succeeds', async () => {
     const response = await api
       .post('/api/login')
-      .send({username: createdUser.username, password: 'sekret'})
+      .send({ username: createdUser.username, password: 'sekret' })
       .expect(200)
       .expect('Content-Type', /application\/json/)
+
+    createdUser.token = response.body.token
   })
 
   test('login for a user with wrong password fails', async () => {
     const response = await api
       .post('/api/login')
-      .send({username: createdUser.username, password: 'wrong'})
+      .send({ username: createdUser.username, password: 'wrong' })
       .expect(401)
       .expect('Content-Type', /application\/json/)
   })
+})
 
+describe('4.19', () => {
+  let createdUser
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    const nonAdmin = new User({ username: 'guy', passwordHash })
+
+    await user.save()
+    createdUser = await nonAdmin.save()
+    const response = await api
+      .post('/api/login')
+      .send({ username: createdUser.username, password: 'sekret' })
+
+    createdUser.token = response.body.token
+  })
+
+    test('new blog creation succeeds with user with proper ID and token', async () => {
+      console.log(createdUser._id.toString())
+      const newBlog = {
+        ...helper.initialBlogs[0],
+        userId: createdUser._id.toString(),
+      }
+      const beforePost = await api.get('/api/blogs')
+      const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .set('Authorization', `Bearer ${createdUser.token}`)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+      const afterPost = await api.get('/api/blogs')
+      expect(afterPost.body.length).toEqual(beforePost.body.length + 1)
+    })
+
+    test('new blog creation fails with user with proper ID but wrong token', async () => {
+      console.log(createdUser._id.toString())
+      const newBlog = {
+        ...helper.initialBlogs[0],
+        userId: createdUser._id.toString(),
+      }
+
+      const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .set('Authorization', `Bearer: '124'`)
+        .expect(500)
+
+
+    })
 })
 
 afterAll(async () => {
