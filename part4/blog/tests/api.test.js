@@ -295,6 +295,38 @@ describe('4.17', () => {
   })
 })
 
+
+describe('4.18', () => {
+  let createdUser
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    const nonAdmin = new User({ username: 'guy', passwordHash })
+
+    await user.save()
+    createdUser = await nonAdmin.save()
+  })
+
+  test('login for a user succeeds', async () => {
+    const response = await api
+      .post('/api/login')
+      .send({username: createdUser.username, password: 'sekret'})
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+
+  test('login for a user with wrong password fails', async () => {
+    const response = await api
+      .post('/api/login')
+      .send({username: createdUser.username, password: 'wrong'})
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+  })
+
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
