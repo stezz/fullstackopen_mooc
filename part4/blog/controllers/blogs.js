@@ -28,14 +28,10 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
+  const user = request.user
+  console.log(user)
 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
-  const user = await User.findById(decodedToken.id)
-
-  if (user !== null) {
+  if (typeof user === 'object') {
     let {userId, ...blogData} = request.body
     const blog = new Blog({...blogData, user: user.id})
     const result = await blog.save()
@@ -50,8 +46,21 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  const blog = await Blog.findByIdAndRemove(request.params.id)
-  response.status(204).end()
+  const user = request.user
+  console.log(user)
+
+  const blog = await Blog.findById(request.params.id)
+
+  if (blog === null ) {
+    response.status(404).json({error: 'blog does not exist'})
+  }
+
+  if ( blog.user.toString() === user.id.toString() ) {
+    await Blog.findByIdAndRemove(request.params.id)
+    response.status(204).end()
+  } else {
+    response.status(401).json({ error: 'Unauthorized to delete this blog' })
+  }
 })
 
 blogsRouter.put('/:id', async (request, response) => {

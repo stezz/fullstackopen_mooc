@@ -1,6 +1,6 @@
 post http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZXp6IiwiaWQiOiI2NTA2ZjNjZmE2MzM5YjUyYzVhZGQzOTEiLCJpYXQiOjE2OTQ5NTYyNjMsImV4cCI6MTY5NDk1OTg2M30.8hQ3tpeFsX8yXhht8_ZKih2hEu1kwQHv_ZRqmUgG030
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZXp6IiwiaWQiOiI2NTA2ZjNjZmE2MzM5YjUyYzVhZGQzOTEiLCJpYXQiOjE2OTQ5NTgyOTUsImV4cCI6MTY5NDk2MTg5NX0.Bui0PyFLi8A3YJ_1dzZW6VI8ZeFhwc-zAhYapyLNKXA
 
 {
   "title": "Super one",

@@ -40,12 +40,30 @@ describe('4.9', () => {
 })
 
 describe('4.10', () => {
+  let createdUser
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    const nonAdmin = new User({ username: 'guy', passwordHash })
+
+    await user.save()
+    createdUser = await nonAdmin.save()
+    const response = await api
+      .post('/api/login')
+      .send({ username: createdUser.username, password: 'sekret' })
+
+    createdUser.token = response.body.token
+  })
+
   test('a POST operation successfully creates a new blog', async () => {
     const newBlog = { ...helper.initialBlogs[0] }
     const beforePost = await api.get('/api/blogs')
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
     const afterPost = await api.get('/api/blogs')
@@ -57,6 +75,7 @@ describe('4.10', () => {
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
     const createdBlog = await api.get(`/api/blogs/${response.body.id}`)
@@ -67,12 +86,29 @@ describe('4.10', () => {
 })
 
 describe('4.11', () => {
+  let createdUser
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    const nonAdmin = new User({ username: 'guy', passwordHash })
+
+    await user.save()
+    createdUser = await nonAdmin.save()
+    const response = await api
+      .post('/api/login')
+      .send({ username: createdUser.username, password: 'sekret' })
+
+    createdUser.token = response.body.token
+  })
   test('if the like property is missing it defaults to 0', async () => {
     const newBlog = { ...helper.initialBlogs[0] }
     delete newBlog.likes
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
     const createdBlog = await api.get(`/api/blogs/${response.body.id}`)
@@ -98,9 +134,28 @@ describe('4.12', () => {
 })
 
 describe('4.13', () => {
+  let createdUser
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+    const nonAdmin = new User({ username: 'guy', passwordHash })
+
+    await user.save()
+    createdUser = await nonAdmin.save()
+    const response = await api
+      .post('/api/login')
+      .send({ username: createdUser.username, password: 'sekret' })
+
+    createdUser.token = response.body.token
+  })
   test('a blog post is properly deleted', async () => {
     const beforeDelete = await api.get('/api/blogs')
-    await api.delete(`/api/blogs/${beforeDelete.body[0].id}`)
+    await api
+      .delete(`/api/blogs/${beforeDelete.body[0].id}`)
+      .set('Authorization', `Bearer ${createdUser.token}`)
+
     const afterDelete = await api.get('/api/blogs')
     expect(afterDelete.body.length).toEqual(beforeDelete.body.length - 1)
   })
@@ -108,7 +163,10 @@ describe('4.13', () => {
   test('exactly the blog post we want is properly deleted', async () => {
     const beforeDelete = await api.get('/api/blogs')
     const idToDelete = beforeDelete.body[0].id
-    await api.delete(`/api/blogs/${idToDelete}`)
+    await api
+      .delete(`/api/blogs/${idToDelete}`)
+      .set('Authorization', `Bearer ${createdUser.token}`)
+
     const afterDelete = await api.get('/api/blogs')
     ids = afterDelete.body.map((x) => x.id)
     expect(ids).not.toContain(idToDelete)
@@ -261,18 +319,25 @@ describe('4.17', () => {
 
     await user.save()
     createdUser = await nonAdmin.save()
+
+    await user.save()
+    createdUser = await nonAdmin.save()
+    const response = await api
+      .post('/api/login')
+      .send({ username: createdUser.username, password: 'sekret' })
+
+    createdUser.token = response.body.token
   })
 
   test('new blog creation succeeds with user with proper ID', async () => {
-    console.log(createdUser._id.toString())
     const newBlog = {
       ...helper.initialBlogs[0],
-      userId: createdUser._id.toString(),
     }
     const beforePost = await api.get('/api/blogs')
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
     const afterPost = await api.get('/api/blogs')
@@ -345,38 +410,39 @@ describe('4.19', () => {
     createdUser.token = response.body.token
   })
 
-    test('new blog creation succeeds with user with proper ID and token', async () => {
-      console.log(createdUser._id.toString())
-      const newBlog = {
-        ...helper.initialBlogs[0],
-        userId: createdUser._id.toString(),
-      }
-      const beforePost = await api.get('/api/blogs')
-      const response = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .set('Authorization', `Bearer ${createdUser.token}`)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
-      const afterPost = await api.get('/api/blogs')
-      expect(afterPost.body.length).toEqual(beforePost.body.length + 1)
-    })
+  test('new blog creation succeeds with user with proper ID and token', async () => {
+    console.log(createdUser._id.toString())
+    const newBlog = {
+      ...helper.initialBlogs[0],
+      userId: createdUser._id.toString(),
+    }
+    const beforePost = await api.get('/api/blogs')
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${createdUser.token}`)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    const afterPost = await api.get('/api/blogs')
+    expect(afterPost.body.length).toEqual(beforePost.body.length + 1)
+  })
 
-    test('new blog creation fails with user with proper ID but wrong token', async () => {
-      console.log(createdUser._id.toString())
-      const newBlog = {
-        ...helper.initialBlogs[0],
-        userId: createdUser._id.toString(),
-      }
+  test('new blog creation fails with user with proper ID but wrong token', async () => {
+    console.log(createdUser._id.toString())
+    const newBlog = {
+      ...helper.initialBlogs[0],
+      userId: createdUser._id.toString(),
+    }
 
-      const response = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .set('Authorization', `Bearer: '124'`)
-        .expect(500)
-
-
-    })
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set(
+        'Authorization',
+        'Bearer byJsbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN0ZXp6IiwiaWQiOiI2NTA2ZjNjZmE2MzM5YjUyYzVhZGQzOTEiLCJpYXQiOjE2OTQ5NTgyOTUsImV4cCI6MTY5NDk2MTg5NX0.Bui0PyFLi8A3YJ_1dzZW6VI8ZeFhwc-zAhYapyLNKXA'
+      )
+      .expect(401)
+  })
 })
 
 afterAll(async () => {
